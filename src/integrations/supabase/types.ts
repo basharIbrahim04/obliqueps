@@ -14,16 +14,204 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      orders: {
+        Row: {
+          color: string | null
+          created_at: string
+          customer_email: string
+          customer_name: string
+          customer_phone: string | null
+          delivery_method: string | null
+          estimated_cost: number | null
+          estimated_time: number | null
+          estimated_weight: number | null
+          file_name: string
+          file_size: number
+          file_url: string | null
+          final_cost: number | null
+          id: string
+          infill: number | null
+          layer_height: number | null
+          material: string
+          notes: string | null
+          priority: string | null
+          status: string
+          supports: boolean | null
+          updated_at: string
+          user_id: string | null
+          wall_thickness: number | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          customer_email: string
+          customer_name: string
+          customer_phone?: string | null
+          delivery_method?: string | null
+          estimated_cost?: number | null
+          estimated_time?: number | null
+          estimated_weight?: number | null
+          file_name: string
+          file_size: number
+          file_url?: string | null
+          final_cost?: number | null
+          id?: string
+          infill?: number | null
+          layer_height?: number | null
+          material: string
+          notes?: string | null
+          priority?: string | null
+          status?: string
+          supports?: boolean | null
+          updated_at?: string
+          user_id?: string | null
+          wall_thickness?: number | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          customer_email?: string
+          customer_name?: string
+          customer_phone?: string | null
+          delivery_method?: string | null
+          estimated_cost?: number | null
+          estimated_time?: number | null
+          estimated_weight?: number | null
+          file_name?: string
+          file_size?: number
+          file_url?: string | null
+          final_cost?: number | null
+          id?: string
+          infill?: number | null
+          layer_height?: number | null
+          material?: string
+          notes?: string | null
+          priority?: string | null
+          status?: string
+          supports?: boolean | null
+          updated_at?: string
+          user_id?: string | null
+          wall_thickness?: number | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          email: string | null
+          id: string
+          phone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      saved_models: {
+        Row: {
+          color: string | null
+          created_at: string
+          estimated_cost: number | null
+          estimated_time: number | null
+          estimated_weight: number | null
+          file_name: string
+          file_size: number
+          file_url: string | null
+          id: string
+          infill: number | null
+          layer_height: number | null
+          material: string
+          supports: boolean | null
+          user_id: string
+          wall_thickness: number | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          estimated_cost?: number | null
+          estimated_time?: number | null
+          estimated_weight?: number | null
+          file_name: string
+          file_size: number
+          file_url?: string | null
+          id?: string
+          infill?: number | null
+          layer_height?: number | null
+          material?: string
+          supports?: boolean | null
+          user_id: string
+          wall_thickness?: number | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          estimated_cost?: number | null
+          estimated_time?: number | null
+          estimated_weight?: number | null
+          file_name?: string
+          file_size?: number
+          file_url?: string | null
+          id?: string
+          infill?: number | null
+          layer_height?: number | null
+          material?: string
+          supports?: boolean | null
+          user_id?: string
+          wall_thickness?: number | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +338,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const
