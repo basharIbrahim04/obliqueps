@@ -11,7 +11,7 @@ export const MATERIALS: Material[] = [
   {
     id: "pla",
     name: "PLA",
-    pricePerGram: 0.03,
+    pricePerGram: 0.3,
     colors: ["#FFFFFF", "#1A1A1A", "#00E5FF", "#EF4444", "#22C55E", "#F59E0B", "#8B5CF6"],
     colorLabels: ["White", "Black", "Cyan", "Red", "Green", "Gold", "Purple"],
     recommended: ["display", "outdoor"],
@@ -19,7 +19,7 @@ export const MATERIALS: Material[] = [
   {
     id: "petg",
     name: "PETG",
-    pricePerGram: 0.04,
+    pricePerGram: 0.4,
     colors: ["#FFFFFF", "#1A1A1A", "#00E5FF", "#22C55E", "#F97316"],
     colorLabels: ["White", "Black", "Cyan", "Green", "Orange"],
     recommended: ["functional", "outdoor"],
@@ -27,7 +27,7 @@ export const MATERIALS: Material[] = [
   {
     id: "pla_silk",
     name: "PLA Silk",
-    pricePerGram: 0.05,
+    pricePerGram: 0..35,
     colors: ["#C5A44E", "#C0C0C0", "#B87333", "#E8B4B8", "#4169E1"],
     colorLabels: ["Gold", "Silver", "Copper", "Rose", "Royal Blue"],
     recommended: ["display"],
