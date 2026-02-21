@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef, useCallback } from "react";
 import HeroSection from "@/components/HeroSection";
 import FileUploader from "@/components/FileUploader";
 import STLViewer from "@/components/STLViewer";
@@ -9,24 +9,30 @@ import FileHealthCheck from "@/components/FileHealthCheck";
 import DeliveryEstimation from "@/components/DeliveryEstimation";
 import OrderForm from "@/components/OrderForm";
 import Logo3DService from "@/components/Logo3DService";
-import { DEFAULT_SETTINGS, estimateCost, analyzeFileHealth, USE_CASES, type PrintSettings, type Estimate } from "@/lib/estimator";
+import { DEFAULT_SETTINGS, estimateCost, analyzeFileHealth, USE_CASES, type PrintSettings, type Estimate, type ModelData } from "@/lib/estimator";
+import { type STLData } from "@/lib/stlParser";
 import { motion } from "framer-motion";
 
 const Index = () => {
   const [file, setFile] = useState<File | null>(null);
   const [settings, setSettings] = useState<PrintSettings>(DEFAULT_SETTINGS);
   const [useCase, setUseCase] = useState<string | null>(null);
+  const [modelData, setModelData] = useState<ModelData | null>(null);
   const uploadRef = useRef<HTMLDivElement>(null);
+
+  const handleModelParsed = useCallback((data: STLData) => {
+    setModelData({ volumeCm3: data.volume, dimensions: data.dimensions });
+  }, []);
 
   const estimate: Estimate | null = useMemo(() => {
     if (!file) return null;
-    return estimateCost(file.size, settings);
-  }, [file, settings]);
+    return estimateCost(file.size, settings, modelData ?? undefined);
+  }, [file, settings, modelData]);
 
   const fileHealth = useMemo(() => {
     if (!file) return null;
-    return analyzeFileHealth(file.size);
-  }, [file]);
+    return analyzeFileHealth(file.size, modelData ?? undefined);
+  }, [file, modelData]);
 
   const handleUseCaseSelect = (id: string) => {
     setUseCase(id);
@@ -61,13 +67,13 @@ const Index = () => {
           {/* Step 1: Upload */}
           <section ref={uploadRef}>
             <StepLabel step={1} label="Upload Your Model" />
-            <FileUploader selectedFile={file} onFileSelected={setFile} onClear={() => setFile(null)} />
+            <FileUploader selectedFile={file} onFileSelected={(f) => { setFile(f); setModelData(null); }} onClear={() => { setFile(null); setModelData(null); }} />
           </section>
 
           {/* 3D Preview + Health */}
           {file && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-              <STLViewer file={file} />
+              <STLViewer file={file} onModelParsed={handleModelParsed} />
               {fileHealth && <FileHealthCheck health={fileHealth} />}
             </motion.div>
           )}
@@ -98,6 +104,7 @@ const Index = () => {
                 estimate={estimate}
                 settings={settings}
                 fileSizeBytes={file!.size}
+                modelData={modelData ?? undefined}
                 onSettingsChange={setSettings}
               />
             </section>

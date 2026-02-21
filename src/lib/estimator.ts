@@ -69,15 +69,27 @@ export const DEFAULT_SETTINGS: PrintSettings = {
   priority: "standard",
 };
 
-export function estimateCost(fileSizeBytes: number, settings: PrintSettings): Estimate {
-  const fileSizeMB = fileSizeBytes / (1024 * 1024);
+export interface ModelData {
+  volumeCm3: number;
+  dimensions: { x: number; y: number; z: number };
+}
 
-  // Weight estimation from file size with infill multiplier
+export function estimateCost(fileSizeBytes: number, settings: PrintSettings, modelData?: ModelData): Estimate {
+  // Use real volume if available, otherwise estimate from file size
   const infillMultiplier = 0.5 + (settings.infill / 100) * 0.8;
   const wallMultiplier = settings.wallThickness / 1.2;
-  const weightGrams = Math.round(fileSizeMB * 22 * infillMultiplier * wallMultiplier);
 
-  // Print time depends on layer height and weight
+  let weightGrams: number;
+  if (modelData && modelData.volumeCm3 > 0) {
+    // Real volume: density of PLA ~1.24 g/cm³, adjusted for infill & walls
+    const density = settings.material.id === "abs" ? 1.04 : settings.material.id === "petg" ? 1.27 : 1.24;
+    weightGrams = Math.round(modelData.volumeCm3 * density * infillMultiplier * wallMultiplier);
+  } else {
+    const fileSizeMB = fileSizeBytes / (1024 * 1024);
+    weightGrams = Math.round(fileSizeMB * 22 * infillMultiplier * wallMultiplier);
+  }
+
+  // Print time: based on volume and layer height
   const layerMultiplier = 0.2 / settings.layerHeight;
   const supportMultiplier = settings.supports ? 1.3 : 1;
   const printTimeHours = Math.round((weightGrams * 0.08 * layerMultiplier * supportMultiplier + 0.5) * 10) / 10;
@@ -122,13 +134,18 @@ export interface FileHealth {
   printable: "ok" | "warn" | "error";
 }
 
-export function analyzeFileHealth(fileSizeBytes: number): FileHealth {
+export function analyzeFileHealth(fileSizeBytes: number, modelData?: ModelData): FileHealth {
   const sizeMB = fileSizeBytes / (1024 * 1024);
+  const MAX = { x: 220, y: 220, z: 250 };
+  const exceedsBuild = modelData
+    ? modelData.dimensions.x > MAX.x || modelData.dimensions.y > MAX.y || modelData.dimensions.z > MAX.z
+    : false;
+
   return {
-    thinWalls: sizeMB < 0.1 ? "warn" : "ok",
+    thinWalls: modelData && modelData.volumeCm3 < 0.5 ? "warn" : sizeMB < 0.1 ? "warn" : "ok",
     overhang: sizeMB > 5 ? "warn" : "ok",
     supportNeeded: sizeMB > 3 ? "warn" : "ok",
-    printable: sizeMB > 50 ? "error" : "ok",
+    printable: exceedsBuild ? "error" : sizeMB > 50 ? "error" : "ok",
   };
 }
 
