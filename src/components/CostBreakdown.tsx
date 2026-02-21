@@ -1,4 +1,4 @@
-import { type Estimate, type PrintSettings, getOptimizedSettings, estimateCost } from "@/lib/estimator";
+import { type Estimate, type PrintSettings, type ModelData, getOptimizedSettings, estimateCost } from "@/lib/estimator";
 import { Weight, Clock, DollarSign, Layers, Zap, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
@@ -7,10 +7,11 @@ interface CostBreakdownProps {
   estimate: Estimate;
   settings: PrintSettings;
   fileSizeBytes: number;
+  modelData?: ModelData;
   onSettingsChange: (s: PrintSettings) => void;
 }
 
-const CostBreakdown = ({ estimate, settings, fileSizeBytes, onSettingsChange }: CostBreakdownProps) => {
+const CostBreakdown = ({ estimate, settings, fileSizeBytes, modelData, onSettingsChange }: CostBreakdownProps) => {
   const [showWhy, setShowWhy] = useState(false);
   const [showSaved, setShowSaved] = useState(false);
 
@@ -18,7 +19,7 @@ const CostBreakdown = ({ estimate, settings, fileSizeBytes, onSettingsChange }: 
     const optimized = getOptimizedSettings(settings);
     const oldTotal = estimate.totalCost;
     onSettingsChange(optimized);
-    const newEstimate = estimateCost(fileSizeBytes, optimized);
+    const newEstimate = estimateCost(fileSizeBytes, optimized, modelData);
     const saved = oldTotal - newEstimate.totalCost;
     if (saved > 0) setShowSaved(true);
     setTimeout(() => setShowSaved(false), 3000);
