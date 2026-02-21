@@ -69,7 +69,7 @@ const OrderForm = ({ file, estimate, settings }: OrderFormProps) => {
     `File: ${file.name}\n` +
     `Material: ${settings.material.name}\n` +
     `Weight: ${estimate.weightGrams}g\n` +
-    `Price: $${estimate.totalCost.toFixed(2)}\n` +
+    `Price: ₪${estimate.totalCost.toFixed(2)}\n` +
     `Time: ${estimate.printTimeHours}h`
   );
 

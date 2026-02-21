@@ -65,7 +65,7 @@ const CostBreakdown = ({ estimate, settings, fileSizeBytes, modelData, onSetting
             animate={{ scale: 1, color: "inherit" }}
             className="text-3xl font-display font-bold text-gradient"
           >
-            ${estimate.totalCost.toFixed(2)}
+            ₪{estimate.totalCost.toFixed(2)}
           </motion.span>
         </div>
 
@@ -110,12 +110,12 @@ const CostBreakdown = ({ estimate, settings, fileSizeBytes, modelData, onSetting
                 className="overflow-hidden"
               >
                 <div className="px-5 pb-4 text-xs text-muted-foreground leading-relaxed space-y-1">
-                  <p>• Material cost is based on ${settings.material.pricePerGram}/g × {estimate.weightGrams}g</p>
-                  <p>• Machine cost is $1/hr × {estimate.printTimeHours}h of print time</p>
-                  <p>• Electricity is $0.20/hr for printer power</p>
-                  <p>• $2 base fee covers setup and quality inspection</p>
+                  <p>• Material cost is based on ₪{settings.material.pricePerGram}/g × {estimate.weightGrams}g</p>
+                  <p>• Machine cost is ₪1/hr × {estimate.printTimeHours}h of print time</p>
+                  <p>• Electricity is ₪0.20/hr for printer power</p>
+                  <p>• ₪2 base fee covers setup and quality inspection</p>
                   {estimate.discountPercent > 0 && <p>• Bulk discount of {estimate.discountPercent}% applied for {estimate.weightGrams}g+</p>}
-                  <p>• Minimum charge is $5 per order</p>
+                  <p>• Minimum charge is ₪5 per order</p>
                 </div>
               </motion.div>
             )}
@@ -140,7 +140,7 @@ const LineItem = ({ label, value, isDiscount }: { label: string; value: number; 
   <div className="flex justify-between font-mono">
     <span className="text-muted-foreground">{label}</span>
     <span className={isDiscount ? "text-primary" : "text-foreground"}>
-      {isDiscount ? "-" : ""}${Math.abs(value).toFixed(2)}
+      {isDiscount ? "-" : ""}₪{Math.abs(value).toFixed(2)}
     </span>
   </div>
 );
