@@ -25,16 +25,16 @@ export const MATERIALS: Material[] = [
     recommended: ["functional", "outdoor"],
   },
   {
-    id: "abs",
-    name: "ABS",
-    pricePerGram: 0.035,
-    colors: ["#FFFFFF", "#1A1A1A", "#3B82F6", "#EF4444", "#D4D4D4"],
-    colorLabels: ["White", "Black", "Blue", "Red", "Grey"],
-    recommended: ["functional", "highstrength"],
+    id: "pla_silk",
+    name: "PLA Silk",
+    pricePerGram: 0.05,
+    colors: ["#C5A44E", "#C0C0C0", "#B87333", "#E8B4B8", "#4169E1"],
+    colorLabels: ["Gold", "Silver", "Copper", "Rose", "Royal Blue"],
+    recommended: ["display"],
   },
 ];
 
-export const LAYER_HEIGHTS = [0.1, 0.15, 0.2, 0.28, 0.3];
+export const LAYER_HEIGHTS = [0.1, 0.15, 0.2, 0.28];
 
 export interface PrintSettings {
   material: Material;
@@ -82,7 +82,7 @@ export function estimateCost(fileSizeBytes: number, settings: PrintSettings, mod
   let weightGrams: number;
   if (modelData && modelData.volumeCm3 > 0) {
     // Real volume: density of PLA ~1.24 g/cm³, adjusted for infill & walls
-    const density = settings.material.id === "abs" ? 1.04 : settings.material.id === "petg" ? 1.27 : 1.24;
+    const density = settings.material.id === "petg" ? 1.27 : 1.25;
     weightGrams = Math.round(modelData.volumeCm3 * density * infillMultiplier * wallMultiplier);
   } else {
     const fileSizeMB = fileSizeBytes / (1024 * 1024);
@@ -122,7 +122,7 @@ export function getOptimizedSettings(settings: PrintSettings): PrintSettings {
   return {
     ...settings,
     infill: Math.max(10, settings.infill - 10),
-    layerHeight: Math.min(0.3, settings.layerHeight + 0.08),
+    layerHeight: Math.min(0.28, settings.layerHeight + 0.08),
     supports: false,
   };
 }

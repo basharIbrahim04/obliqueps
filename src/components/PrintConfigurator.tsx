@@ -31,7 +31,7 @@ const PrintConfigurator = ({ settings, onChange }: PrintConfiguratorProps) => {
               `}
             >
               <span className="font-display text-xs">{m.name}</span>
-              <span className="block text-xs text-muted-foreground font-mono mt-1">${m.pricePerGram}/g</span>
+              <span className="block text-xs text-muted-foreground font-mono mt-1">₪{m.pricePerGram}/g</span>
             </button>
           ))}
         </div>
