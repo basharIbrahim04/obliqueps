@@ -1,4 +1,4 @@
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { Resend } from "npm:resend@4";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -14,6 +14,12 @@ Deno.serve(async (req) => {
   }
 
   try {
+    const resendKey = Deno.env.get("RESEND_API_KEY");
+    if (!resendKey) {
+      throw new Error("RESEND_API_KEY not configured");
+    }
+
+    const resend = new Resend(resendKey);
     const body = await req.json();
     const {
       customerName, customerEmail, customerPhone,
@@ -60,34 +66,22 @@ Deno.serve(async (req) => {
       </div>
     `;
 
-    // Use Supabase's built-in email via the auth admin API is not available for custom emails.
-    // We'll use the Resend API if available, otherwise log for now.
-    const resendKey = Deno.env.get("RESEND_API_KEY");
+    const { data, error } = await resend.emails.send({
+      from: "Oblique 3D <onboarding@resend.dev>",
+      to: [OWNER_EMAIL],
+      subject: `New Order: ${fileName} — ₪${Number(estimatedCost).toFixed(2)}`,
+      html: emailHtml,
+    });
 
-    if (resendKey) {
-      const res = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${resendKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          from: "Oblique 3D <onboarding@resend.dev>",
-          to: [OWNER_EMAIL],
-          subject: `New Order: ${fileName} — ₪${Number(estimatedCost).toFixed(2)}`,
-          html: emailHtml,
-        }),
-      });
-      const data = await res.json();
-      return new Response(JSON.stringify({ success: true, data }), {
+    if (error) {
+      console.error("Resend error:", error);
+      return new Response(JSON.stringify({ error: error.message }), {
+        status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Fallback: just log the order (email will work once RESEND_API_KEY is added)
-    console.log("Order email would be sent to:", OWNER_EMAIL);
-    console.log("Order details:", body);
-    return new Response(JSON.stringify({ success: true, message: "Order logged. Add RESEND_API_KEY to enable email." }), {
+    return new Response(JSON.stringify({ success: true, id: data?.id }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {
