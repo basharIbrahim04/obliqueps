@@ -11,7 +11,7 @@ export const MATERIALS: Material[] = [
   {
     id: "pla",
     name: "PLA",
-    pricePerGram: 0.03,
+    pricePerGram: 0.25,
     colors: ["#FFFFFF", "#1A1A1A", "#00E5FF", "#EF4444", "#22C55E", "#F59E0B", "#8B5CF6"],
     colorLabels: ["White", "Black", "Cyan", "Red", "Green", "Gold", "Purple"],
     recommended: ["display", "outdoor"],
@@ -19,7 +19,7 @@ export const MATERIALS: Material[] = [
   {
     id: "petg",
     name: "PETG",
-    pricePerGram: 0.04,
+    pricePerGram: 0.25,
     colors: ["#FFFFFF", "#1A1A1A", "#00E5FF", "#22C55E", "#F97316"],
     colorLabels: ["White", "Black", "Cyan", "Green", "Orange"],
     recommended: ["functional", "outdoor"],
@@ -27,7 +27,7 @@ export const MATERIALS: Material[] = [
   {
     id: "pla_silk",
     name: "PLA Silk",
-    pricePerGram: 0.05,
+    pricePerGram: 0.25,
     colors: ["#C5A44E", "#C0C0C0", "#B87333", "#E8B4B8", "#4169E1"],
     colorLabels: ["Gold", "Silver", "Copper", "Rose", "Royal Blue"],
     recommended: ["display"],
@@ -49,10 +49,10 @@ export interface PrintSettings {
 export interface Estimate {
   weightGrams: number;
   printTimeHours: number;
+  printTimeMinutes: number;
   materialCost: number;
   machineCost: number;
   electricityCost: number;
-  baseFee: number;
   discount: number;
   discountPercent: number;
   prioritySurcharge: number;
@@ -75,13 +75,11 @@ export interface ModelData {
 }
 
 export function estimateCost(fileSizeBytes: number, settings: PrintSettings, modelData?: ModelData): Estimate {
-  // Use real volume if available, otherwise estimate from file size
   const infillMultiplier = 0.5 + (settings.infill / 100) * 0.8;
   const wallMultiplier = settings.wallThickness / 1.2;
 
   let weightGrams: number;
   if (modelData && modelData.volumeCm3 > 0) {
-    // Real volume: density of PLA ~1.24 g/cm³, adjusted for infill & walls
     const density = settings.material.id === "petg" ? 1.27 : 1.25;
     weightGrams = Math.round(modelData.volumeCm3 * density * infillMultiplier * wallMultiplier);
   } else {
@@ -89,23 +87,27 @@ export function estimateCost(fileSizeBytes: number, settings: PrintSettings, mod
     weightGrams = Math.round(fileSizeMB * 22 * infillMultiplier * wallMultiplier);
   }
 
-  // Print time: based on volume and layer height
+  // Print time: 10g per 25 minutes = 0.4g/min base rate
+  const baseTimeMinutes = weightGrams / 0.4;
+  // Apply layer height multiplier (finer layers = more time)
   const layerMultiplier = 0.2 / settings.layerHeight;
   const supportMultiplier = settings.supports ? 1.3 : 1;
-  const printTimeHours = Math.round((weightGrams * 0.08 * layerMultiplier * supportMultiplier + 0.5) * 10) / 10;
+  const totalMinutes = Math.round(baseTimeMinutes * layerMultiplier * supportMultiplier);
+  const printTimeHours = Math.floor(totalMinutes / 60);
+  const printTimeMinutes = totalMinutes % 60;
+  const printTimeDecimal = Math.round((totalMinutes / 60) * 100) / 100;
 
   // Costs
   const materialCost = Math.round(weightGrams * settings.material.pricePerGram * 100) / 100;
-  const machineCost = Math.round(printTimeHours * 1 * 100) / 100;
-  const electricityCost = Math.round(printTimeHours * 0.2 * 100) / 100;
-  const baseFee = 2;
+  const machineCost = Math.round(printTimeDecimal * 5 * 100) / 100;
+  const electricityCost = Math.round(printTimeDecimal * 0.2 * 100) / 100;
 
   // Bulk discounts
   let discountPercent = 0;
   if (weightGrams >= 600) discountPercent = 10;
   else if (weightGrams >= 300) discountPercent = 5;
 
-  const subtotal = materialCost + machineCost + electricityCost + baseFee;
+  const subtotal = materialCost + machineCost + electricityCost;
   const discount = Math.round(subtotal * (discountPercent / 100) * 100) / 100;
 
   // Priority surcharge
@@ -113,9 +115,9 @@ export function estimateCost(fileSizeBytes: number, settings: PrintSettings, mod
   if (settings.priority === "priority") prioritySurcharge = 3;
   if (settings.priority === "rush") prioritySurcharge = 8;
 
-  const totalCost = Math.max(5, Math.round((subtotal - discount + prioritySurcharge) * 100) / 100);
+  const totalCost = Math.max(20, Math.round((subtotal - discount + prioritySurcharge) * 100) / 100);
 
-  return { weightGrams, printTimeHours, materialCost, machineCost, electricityCost, baseFee, discount, discountPercent, prioritySurcharge, totalCost };
+  return { weightGrams, printTimeHours, printTimeMinutes, materialCost, machineCost, electricityCost, discount, discountPercent, prioritySurcharge, totalCost };
 }
 
 export function getOptimizedSettings(settings: PrintSettings): PrintSettings {
