@@ -43,7 +43,7 @@ const CostBreakdown = ({ estimate, settings, fileSizeBytes, modelData, onSetting
         {/* Stats */}
         <div className="grid grid-cols-2 gap-px bg-border">
           <Stat icon={<Weight className="w-4 h-4" />} label="Weight" value={`${estimate.weightGrams}g`} />
-          <Stat icon={<Clock className="w-4 h-4" />} label="Print Time" value={`${estimate.printTimeHours}h`} />
+          <Stat icon={<Clock className="w-4 h-4" />} label="Print Time" value={`${estimate.printTimeHours}h ${estimate.printTimeMinutes}m`} />
         </div>
 
         {/* Line items */}
@@ -51,7 +51,6 @@ const CostBreakdown = ({ estimate, settings, fileSizeBytes, modelData, onSetting
           <LineItem label={`${settings.material.name} Material`} value={estimate.materialCost} />
           <LineItem label="Machine Time" value={estimate.machineCost} />
           <LineItem label="Electricity" value={estimate.electricityCost} />
-          <LineItem label="Base Fee" value={estimate.baseFee} />
           {estimate.discount > 0 && <LineItem label="Bulk Discount" value={-estimate.discount} isDiscount />}
           {estimate.prioritySurcharge > 0 && <LineItem label="Priority" value={estimate.prioritySurcharge} />}
         </div>
@@ -110,12 +109,11 @@ const CostBreakdown = ({ estimate, settings, fileSizeBytes, modelData, onSetting
                 className="overflow-hidden"
               >
                 <div className="px-5 pb-4 text-xs text-muted-foreground leading-relaxed space-y-1">
-                  <p>• Material cost is based on ₪{settings.material.pricePerGram}/g × {estimate.weightGrams}g</p>
-                  <p>• Machine cost is ₪1/hr × {estimate.printTimeHours}h of print time</p>
+                  <p>• Material cost is ₪{settings.material.pricePerGram}/g × {estimate.weightGrams}g</p>
+                  <p>• Machine cost is ₪5/hr × {estimate.printTimeHours}h {estimate.printTimeMinutes}m</p>
                   <p>• Electricity is ₪0.20/hr for printer power</p>
-                  <p>• ₪2 base fee covers setup and quality inspection</p>
                   {estimate.discountPercent > 0 && <p>• Bulk discount of {estimate.discountPercent}% applied for {estimate.weightGrams}g+</p>}
-                  <p>• Minimum charge is ₪5 per order</p>
+                  <p>• Minimum charge is ₪20 per order</p>
                 </div>
               </motion.div>
             )}
