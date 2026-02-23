@@ -15,22 +15,22 @@ const DeliveryEstimation = ({ estimate, settings, onPriorityChange }: DeliveryEs
   deliveryDate.setDate(deliveryDate.getDate() + deliveryDays);
 
   return (
-    <div className="glass-panel rounded-lg p-5 space-y-4">
+    <div className="editorial-panel border border-border p-5 space-y-4">
       <div className="grid grid-cols-3 gap-3 text-center">
         <div>
-          <Clock className="w-5 h-5 text-primary mx-auto mb-1" />
+          <Clock className="w-5 h-5 text-walnut mx-auto mb-1" />
           <p className="text-xs text-muted-foreground">Print Time</p>
-          <p className="font-display font-bold text-sm">{estimate.printTimeHours}h</p>
+          <p className="font-display font-bold text-sm italic">{estimate.printTimeHours}h</p>
         </div>
         <div>
-          <Users className="w-5 h-5 text-primary mx-auto mb-1" />
+          <Users className="w-5 h-5 text-walnut mx-auto mb-1" />
           <p className="text-xs text-muted-foreground">Queue</p>
-          <p className="font-display font-bold text-sm">{queueAhead} ahead</p>
+          <p className="font-display font-bold text-sm italic">{queueAhead} ahead</p>
         </div>
         <div>
-          <Calendar className="w-5 h-5 text-primary mx-auto mb-1" />
+          <Calendar className="w-5 h-5 text-walnut mx-auto mb-1" />
           <p className="text-xs text-muted-foreground">Ready By</p>
-          <p className="font-display font-bold text-sm">{deliveryDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })}</p>
+          <p className="font-display font-bold text-sm italic">{deliveryDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })}</p>
         </div>
       </div>
 
@@ -40,10 +40,10 @@ const DeliveryEstimation = ({ estimate, settings, onPriorityChange }: DeliveryEs
             key={p}
             onClick={() => onPriorityChange(p)}
             className={`
-              flex-1 py-2 rounded border text-xs font-display tracking-wider uppercase transition-all
+              flex-1 py-2 border text-xs font-sans tracking-[0.15em] uppercase font-semibold transition-all
               ${settings.priority === p
-                ? "border-primary bg-primary/10 text-primary"
-                : "border-border glass-panel text-muted-foreground hover:border-primary/30"}
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-border bg-background text-muted-foreground hover:border-walnut"}
             `}
           >
             {p === "rush" && <Zap className="w-3 h-3 inline mr-1" />}

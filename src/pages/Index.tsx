@@ -47,23 +47,23 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background blueprint-bg">
+    <div className="min-h-screen bg-background">
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 glass-panel border-b border-border">
-        <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
-          <span className="font-display font-bold text-sm tracking-[0.2em] text-gradient oblique-skew">
+      <nav className="fixed top-0 left-0 right-0 z-50 editorial-panel border-b border-border">
+        <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
+          <span className="font-display font-bold text-lg tracking-tight text-foreground italic">
             OBLIQUE
           </span>
-          <span className="text-xs font-mono text-muted-foreground tracking-wider uppercase">
+          <span className="text-xs font-sans text-muted-foreground tracking-[0.3em] uppercase">
             3D Print Lab
           </span>
         </div>
       </nav>
 
-      <div className="pt-14">
+      <div className="pt-16">
         <HeroSection onUploadClick={scrollToUpload} />
 
-        <main className="max-w-3xl mx-auto px-6 pb-20 -mt-8 relative z-10 space-y-8">
+        <main className="max-w-3xl mx-auto px-6 pb-24 -mt-8 relative z-10 space-y-10">
           {/* Step 1: Upload */}
           <section ref={uploadRef}>
             <StepLabel step={1} label="Upload Your Model" />
@@ -72,7 +72,7 @@ const Index = () => {
 
           {/* 3D Preview + Health */}
           {file && (
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
               <STLViewer file={file} onModelParsed={handleModelParsed} />
               {fileHealth && <FileHealthCheck health={fileHealth} />}
             </motion.div>
@@ -90,7 +90,7 @@ const Index = () => {
           {file && (
             <section>
               <StepLabel step={3} label="Print Settings" />
-              <div className="glass-panel rounded-lg p-5">
+              <div className="editorial-panel p-6">
                 <PrintConfigurator settings={settings} onChange={setSettings} />
               </div>
             </section>
@@ -137,8 +137,8 @@ const Index = () => {
           </section>
         </main>
 
-        <footer className="border-t border-border py-8 text-center">
-          <p className="text-xs text-muted-foreground font-mono">
+        <footer className="border-t border-border py-10 text-center bg-secondary/30">
+          <p className="text-xs text-muted-foreground tracking-[0.2em] uppercase font-sans">
             © 2026 Oblique — Precision 3D Printing
           </p>
         </footer>
@@ -148,13 +148,14 @@ const Index = () => {
 };
 
 const StepLabel = ({ step, label }: { step: number | string; label: string }) => (
-  <div className="flex items-center gap-3 mb-4">
-    <span className="w-7 h-7 rounded bg-primary/10 border border-primary/30 flex items-center justify-center text-xs font-display font-bold text-primary">
+  <div className="flex items-center gap-4 mb-5">
+    <span className="w-8 h-8 bg-primary text-primary-foreground flex items-center justify-center text-xs font-sans font-bold">
       {step}
     </span>
-    <h2 className="text-xs font-display tracking-[0.15em] uppercase text-muted-foreground">
+    <h2 className="text-xs font-sans tracking-[0.2em] uppercase text-muted-foreground font-semibold">
       {label}
     </h2>
+    <span className="flex-1 h-px bg-border" />
   </div>
 );
 

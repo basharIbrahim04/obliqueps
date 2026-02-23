@@ -13,7 +13,7 @@ interface STLViewerProps {
 function STLModel({ geometry }: { geometry: THREE.BufferGeometry }) {
   return (
     <mesh geometry={geometry} rotation={[-Math.PI / 2, 0, 0]}>
-      <meshStandardMaterial color="#00e5ff" wireframe={false} metalness={0.3} roughness={0.4} />
+      <meshStandardMaterial color="#8C7864" wireframe={false} metalness={0.1} roughness={0.6} />
     </mesh>
   );
 }
@@ -29,7 +29,7 @@ function BoundingBoxHelper({ geometry }: { geometry: THREE.BufferGeometry }) {
     <group rotation={[-Math.PI / 2, 0, 0]}>
       <mesh position={[center.x, center.y, center.z]}>
         <boxGeometry args={[size.x, size.y, size.z]} />
-        <meshBasicMaterial color="#00e5ff" wireframe opacity={0.15} transparent />
+        <meshBasicMaterial color="#4E4034" wireframe opacity={0.2} transparent />
       </mesh>
     </group>
   );
@@ -63,21 +63,21 @@ const STLViewer = ({ file, onModelParsed }: STLViewerProps) => {
   const exceeds = dims.x > MAX_SIZE.x || dims.y > MAX_SIZE.y || dims.z > MAX_SIZE.z;
 
   return (
-    <div className="glass-panel rounded-lg overflow-hidden">
-      <div className="h-64 md:h-80 relative">
+    <div className="editorial-panel overflow-hidden border border-border">
+      <div className="h-64 md:h-80 relative bg-secondary/30">
         {loading ? (
-          <div className="flex items-center justify-center h-full bg-background">
-            <Loader2 className="w-8 h-8 text-primary animate-spin" />
+          <div className="flex items-center justify-center h-full">
+            <Loader2 className="w-8 h-8 text-walnut animate-spin" />
             <span className="ml-3 text-sm text-muted-foreground">Parsing model…</span>
           </div>
         ) : error ? (
-          <div className="flex items-center justify-center h-full bg-background text-destructive text-sm">
+          <div className="flex items-center justify-center h-full text-destructive text-sm">
             <AlertTriangle className="w-5 h-5 mr-2" /> {error}
           </div>
         ) : (
-          <Canvas camera={{ position: [200, 150, 200], fov: 50 }} className="bg-background">
-            <ambientLight intensity={0.4} />
-            <directionalLight position={[200, 200, 200]} intensity={0.8} />
+          <Canvas camera={{ position: [200, 150, 200], fov: 50 }} style={{ background: '#EDE9E1' }}>
+            <ambientLight intensity={0.5} />
+            <directionalLight position={[200, 200, 200]} intensity={0.7} />
             <directionalLight position={[-100, 100, -100]} intensity={0.3} />
             <Suspense fallback={null}>
               <Center>
@@ -86,7 +86,7 @@ const STLViewer = ({ file, onModelParsed }: STLViewerProps) => {
               </Center>
             </Suspense>
             <OrbitControls enableDamping dampingFactor={0.05} />
-            <gridHelper args={[500, 50, "#1a2a3a", "#111827"]} />
+            <gridHelper args={[500, 50, "#B7A996", "#D9D2C6"]} />
           </Canvas>
         )}
 
@@ -94,15 +94,15 @@ const STLViewer = ({ file, onModelParsed }: STLViewerProps) => {
           <div className="absolute top-3 right-3 flex gap-2">
             <button
               onClick={() => setShowWireframe(!showWireframe)}
-              className="w-8 h-8 rounded bg-secondary/80 backdrop-blur flex items-center justify-center hover:bg-primary/20 transition-colors"
+              className="w-8 h-8 bg-background/80 backdrop-blur border border-border flex items-center justify-center hover:bg-secondary transition-colors"
               title="Toggle bounding box"
             >
-              <Maximize2 className="w-3.5 h-3.5 text-primary" />
+              <Maximize2 className="w-3.5 h-3.5 text-foreground" />
             </button>
           </div>
         )}
 
-        <div className="absolute bottom-3 left-3 text-xs font-mono text-muted-foreground bg-background/80 backdrop-blur px-2 py-1 rounded">
+        <div className="absolute bottom-3 left-3 text-xs font-mono text-muted-foreground bg-background/80 backdrop-blur px-2 py-1 border border-border">
           Rotate · Zoom · Pan
         </div>
       </div>
@@ -111,13 +111,13 @@ const STLViewer = ({ file, onModelParsed }: STLViewerProps) => {
       <div className="px-4 py-3 border-t border-border flex items-center justify-between flex-wrap gap-2">
         <div className="flex gap-4 text-xs font-mono">
           <span className="text-muted-foreground">
-            X: <span className="text-foreground">{dims.x.toFixed(1)}mm</span>
+            X: <span className="text-foreground font-medium">{dims.x.toFixed(1)}mm</span>
           </span>
           <span className="text-muted-foreground">
-            Y: <span className="text-foreground">{dims.y.toFixed(1)}mm</span>
+            Y: <span className="text-foreground font-medium">{dims.y.toFixed(1)}mm</span>
           </span>
           <span className="text-muted-foreground">
-            Z: <span className="text-foreground">{dims.z.toFixed(1)}mm</span>
+            Z: <span className="text-foreground font-medium">{dims.z.toFixed(1)}mm</span>
           </span>
         </div>
         <div className="flex gap-3 text-xs font-mono text-muted-foreground">

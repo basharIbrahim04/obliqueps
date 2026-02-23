@@ -56,20 +56,20 @@ const FileUploader = ({ onFileSelected, selectedFile, onClear }: FileUploaderPro
 
   if (isUploading) {
     return (
-      <div className="glass-panel rounded-lg p-8">
+      <div className="editorial-panel p-8">
         <div className="text-center mb-4">
-          <Upload className="w-8 h-8 text-primary mx-auto mb-2 animate-pulse-glow" />
-          <p className="text-sm font-mono text-muted-foreground">Processing model...</p>
+          <Upload className="w-8 h-8 text-walnut mx-auto mb-2 animate-pulse" />
+          <p className="text-sm text-muted-foreground">Processing model...</p>
         </div>
-        <div className="w-full h-1.5 bg-secondary rounded-full overflow-hidden">
+        <div className="w-full h-1 bg-secondary overflow-hidden">
           <motion.div
-            className="h-full bg-primary rounded-full"
+            className="h-full bg-primary"
             initial={{ width: 0 }}
             animate={{ width: `${uploadProgress}%` }}
             transition={{ ease: "easeOut" }}
           />
         </div>
-        <p className="text-xs font-mono text-primary text-center mt-2">{Math.round(uploadProgress)}%</p>
+        <p className="text-xs text-muted-foreground text-center mt-2 font-mono">{Math.round(uploadProgress)}%</p>
       </div>
     );
   }
@@ -79,12 +79,12 @@ const FileUploader = ({ onFileSelected, selectedFile, onClear }: FileUploaderPro
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="glass-panel glass-panel-hover rounded-lg p-5 glow-accent"
+        className="editorial-panel editorial-panel-hover p-5 border border-primary/30"
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-11 h-11 rounded bg-primary/10 border border-primary/30 flex items-center justify-center">
-              <FileBox className="w-5 h-5 text-primary" />
+            <div className="w-11 h-11 bg-primary text-primary-foreground flex items-center justify-center">
+              <FileBox className="w-5 h-5" />
             </div>
             <div>
               <p className="font-medium text-foreground text-sm">{selectedFile.name}</p>
@@ -93,7 +93,7 @@ const FileUploader = ({ onFileSelected, selectedFile, onClear }: FileUploaderPro
           </div>
           <button
             onClick={onClear}
-            className="w-8 h-8 rounded bg-secondary flex items-center justify-center hover:bg-destructive/20 transition-colors"
+            className="w-8 h-8 bg-secondary flex items-center justify-center hover:bg-destructive/20 transition-colors"
           >
             <X className="w-4 h-4 text-muted-foreground" />
           </button>
@@ -108,14 +108,14 @@ const FileUploader = ({ onFileSelected, selectedFile, onClear }: FileUploaderPro
       onDragLeave={() => setIsDragging(false)}
       onDrop={handleDrop}
       className={`
-        relative block border-2 border-dashed rounded-lg p-12 text-center cursor-pointer transition-all duration-300
-        ${isDragging ? "border-primary bg-primary/5 glow-accent" : "border-border hover:border-primary/40 glass-panel"}
+        relative block border-2 border-dashed p-14 text-center cursor-pointer transition-all duration-300
+        ${isDragging ? "border-primary bg-primary/5" : "border-border hover:border-walnut editorial-panel"}
       `}
     >
       <input type="file" accept={ACCEPTED.join(",")} onChange={handleChange} className="sr-only" />
       <Upload className={`w-10 h-10 mx-auto mb-4 transition-colors ${isDragging ? "text-primary" : "text-muted-foreground"}`} />
-      <p className="text-foreground font-medium mb-1">Drop your 3D model here</p>
-      <p className="text-sm text-muted-foreground font-mono">STL · OBJ · 3MF</p>
+      <p className="text-foreground font-display text-lg italic mb-1">Drop your 3D model here</p>
+      <p className="text-sm text-muted-foreground tracking-[0.2em] uppercase font-sans">STL · OBJ · 3MF</p>
     </label>
   );
 };
