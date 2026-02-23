@@ -36,6 +36,9 @@ export async function parseSTLFile(file: File): Promise<STLData> {
   const vB = new THREE.Vector3();
   const vC = new THREE.Vector3();
 
+  const ab = new THREE.Vector3();
+  const ac = new THREE.Vector3();
+
   for (let i = 0; i < triangleCount; i++) {
     vA.fromBufferAttribute(position, i * 3);
     vB.fromBufferAttribute(position, i * 3 + 1);
@@ -48,8 +51,8 @@ export async function parseSTLFile(file: File): Promise<STLData> {
       vC.x * (vA.y * vB.z - vB.y * vA.z);
 
     // Triangle area
-    const ab = new THREE.Vector3().subVectors(vB, vA);
-    const ac = new THREE.Vector3().subVectors(vC, vA);
+    ab.subVectors(vB, vA);
+    ac.subVectors(vC, vA);
     surfaceArea += ab.cross(ac).length() / 2;
   }
 

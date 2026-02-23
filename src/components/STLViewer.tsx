@@ -12,7 +12,7 @@ interface STLViewerProps {
 
 function STLModel({ geometry }: { geometry: THREE.BufferGeometry }) {
   return (
-    <mesh geometry={geometry}>
+    <mesh geometry={geometry} rotation={[-Math.PI / 2, 0, 0]}>
       <meshStandardMaterial color="#00e5ff" wireframe={false} metalness={0.3} roughness={0.4} />
     </mesh>
   );
@@ -26,10 +26,12 @@ function BoundingBoxHelper({ geometry }: { geometry: THREE.BufferGeometry }) {
   box.getCenter(center);
 
   return (
-    <mesh position={[center.x, center.y, center.z]}>
-      <boxGeometry args={[size.x, size.y, size.z]} />
-      <meshBasicMaterial color="#00e5ff" wireframe opacity={0.15} transparent />
-    </mesh>
+    <group rotation={[-Math.PI / 2, 0, 0]}>
+      <mesh position={[center.x, center.y, center.z]}>
+        <boxGeometry args={[size.x, size.y, size.z]} />
+        <meshBasicMaterial color="#00e5ff" wireframe opacity={0.15} transparent />
+      </mesh>
+    </group>
   );
 }
 
@@ -73,10 +75,10 @@ const STLViewer = ({ file, onModelParsed }: STLViewerProps) => {
             <AlertTriangle className="w-5 h-5 mr-2" /> {error}
           </div>
         ) : (
-          <Canvas camera={{ position: [5, 3, 5], fov: 50 }} className="bg-background">
+          <Canvas camera={{ position: [200, 150, 200], fov: 50 }} className="bg-background">
             <ambientLight intensity={0.4} />
-            <directionalLight position={[5, 5, 5]} intensity={0.8} />
-            <directionalLight position={[-3, 2, -3]} intensity={0.3} />
+            <directionalLight position={[200, 200, 200]} intensity={0.8} />
+            <directionalLight position={[-100, 100, -100]} intensity={0.3} />
             <Suspense fallback={null}>
               <Center>
                 <STLModel geometry={stlData!.geometry} />
@@ -84,7 +86,7 @@ const STLViewer = ({ file, onModelParsed }: STLViewerProps) => {
               </Center>
             </Suspense>
             <OrbitControls enableDamping dampingFactor={0.05} />
-            <gridHelper args={[10, 10, "#1a2a3a", "#111827"]} />
+            <gridHelper args={[500, 50, "#1a2a3a", "#111827"]} />
           </Canvas>
         )}
 
