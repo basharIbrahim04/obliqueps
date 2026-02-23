@@ -48,7 +48,6 @@ const OrderForm = ({ file, estimate, settings }: OrderFormProps) => {
     setErrors({});
     setSubmitting(true);
 
-    // Upload the STL file to storage
     let fileUrl: string | null = null;
     try {
       const timestamp = Date.now();
@@ -136,22 +135,21 @@ const OrderForm = ({ file, estimate, settings }: OrderFormProps) => {
   );
 
   return (
-    <div className="glass-panel rounded-lg p-5 space-y-4">
+    <div className="editorial-panel border border-border p-5 space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Field label="Name" value={form.name} onChange={(v) => setForm({ ...form, name: v })} error={errors.name} />
         <Field label="Email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} error={errors.email} type="email" />
         <Field label="Phone (optional)" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} />
 
-        {/* Location Selector */}
         <div>
-          <label className="block text-xs font-display tracking-widest uppercase text-muted-foreground mb-1.5">
+          <label className="block text-xs tracking-[0.2em] uppercase text-muted-foreground mb-1.5 font-sans font-semibold">
             <MapPin className="w-3 h-3 inline mr-1" />
             Location
           </label>
           <select
             value={form.location}
             onChange={(e) => setForm({ ...form, location: e.target.value })}
-            className={`w-full bg-secondary/50 border rounded-lg px-3 py-2 text-sm focus:outline-none transition-colors appearance-none
+            className={`w-full bg-background border px-3 py-2 text-sm focus:outline-none transition-colors appearance-none
               ${errors.location ? "border-destructive" : "border-border focus:border-primary"}`}
           >
             <option value="">Select city...</option>
@@ -163,36 +161,35 @@ const OrderForm = ({ file, estimate, settings }: OrderFormProps) => {
         </div>
       </div>
 
-      {/* Address details */}
       {form.location && (
         <div>
-          <label className="block text-xs font-display tracking-widest uppercase text-muted-foreground mb-1.5">
+          <label className="block text-xs tracking-[0.2em] uppercase text-muted-foreground mb-1.5 font-sans font-semibold">
             Exact Address in {form.location}
           </label>
           <input
             value={form.address}
             onChange={(e) => setForm({ ...form, address: e.target.value })}
             maxLength={300}
-            className="w-full bg-secondary/50 border border-border rounded-lg px-3 py-2 text-sm focus:border-primary focus:outline-none"
+            className="w-full bg-background border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none"
             placeholder="Street, building, floor..."
           />
         </div>
       )}
 
       <div>
-        <label className="block text-xs font-display tracking-widest uppercase text-muted-foreground mb-1.5">Notes</label>
+        <label className="block text-xs tracking-[0.2em] uppercase text-muted-foreground mb-1.5 font-sans font-semibold">Notes</label>
         <textarea
           value={form.notes}
           onChange={(e) => setForm({ ...form, notes: e.target.value })}
           rows={2}
           maxLength={500}
-          className="w-full bg-secondary/50 border border-border rounded-lg px-3 py-2 text-sm focus:border-primary focus:outline-none resize-none"
+          className="w-full bg-background border border-border px-3 py-2 text-sm focus:border-primary focus:outline-none resize-none"
           placeholder="Special instructions..."
         />
       </div>
 
       <div className="flex gap-2">
-        <Button onClick={handleSubmit} disabled={submitting} className="flex-1 font-display tracking-wider text-xs">
+        <Button onClick={handleSubmit} disabled={submitting} className="flex-1 tracking-[0.15em] text-xs uppercase font-semibold">
           <Send className="w-3.5 h-3.5 mr-2" />
           {submitting ? "Submitting..." : "Submit Order"}
         </Button>
@@ -200,7 +197,7 @@ const OrderForm = ({ file, estimate, settings }: OrderFormProps) => {
           href={`https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappMessage}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="px-4 py-2 rounded-md border border-green-500/30 bg-green-500/10 text-green-400 text-xs font-display tracking-wider flex items-center gap-2 hover:bg-green-500/20 transition-colors"
+          className="px-4 py-2 border border-green-700/30 bg-green-700/10 text-green-800 text-xs tracking-[0.1em] uppercase font-semibold flex items-center gap-2 hover:bg-green-700/20 transition-colors"
         >
           <MessageCircle className="w-3.5 h-3.5" />
           WhatsApp
@@ -214,12 +211,12 @@ const Field = ({ label, value, onChange, error, type = "text" }: {
   label: string; value: string; onChange: (v: string) => void; error?: string; type?: string;
 }) => (
   <div>
-    <label className="block text-xs font-display tracking-widest uppercase text-muted-foreground mb-1.5">{label}</label>
+    <label className="block text-xs tracking-[0.2em] uppercase text-muted-foreground mb-1.5 font-sans font-semibold">{label}</label>
     <input
       type={type}
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className={`w-full bg-secondary/50 border rounded-lg px-3 py-2 text-sm focus:outline-none transition-colors
+      className={`w-full bg-background border px-3 py-2 text-sm focus:outline-none transition-colors
         ${error ? "border-destructive" : "border-border focus:border-primary"}`}
     />
     {error && <p className="text-xs text-destructive mt-1">{error}</p>}

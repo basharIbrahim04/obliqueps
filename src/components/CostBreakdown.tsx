@@ -27,14 +27,14 @@ const CostBreakdown = ({ estimate, settings, fileSizeBytes, modelData, onSetting
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-      <div className="glass-panel rounded-lg overflow-hidden glow-accent">
+      <div className="editorial-panel border border-border overflow-hidden">
         {/* Header */}
         <div className="px-5 py-3 border-b border-border flex items-center justify-between">
-          <h3 className="font-display text-xs tracking-widest uppercase text-primary flex items-center gap-2">
+          <h3 className="text-xs tracking-[0.2em] uppercase text-muted-foreground font-sans font-semibold flex items-center gap-2">
             <Layers className="w-4 h-4" /> Cost Estimate
           </h3>
           {estimate.discountPercent > 0 && (
-            <span className="text-xs font-mono bg-primary/10 text-primary px-2 py-0.5 rounded">
+            <span className="text-xs font-mono bg-primary text-primary-foreground px-2 py-0.5">
               {estimate.discountPercent}% BULK
             </span>
           )}
@@ -60,9 +60,9 @@ const CostBreakdown = ({ estimate, settings, fileSizeBytes, modelData, onSetting
           <span className="text-muted-foreground font-medium text-sm">Estimated Total</span>
           <motion.span
             key={estimate.totalCost}
-            initial={{ scale: 1.2, color: "#00e5ff" }}
-            animate={{ scale: 1, color: "inherit" }}
-            className="text-3xl font-display font-bold text-gradient"
+            initial={{ scale: 1.2 }}
+            animate={{ scale: 1 }}
+            className="text-3xl font-display font-bold text-foreground italic"
           >
             ₪{estimate.totalCost.toFixed(2)}
           </motion.span>
@@ -72,7 +72,7 @@ const CostBreakdown = ({ estimate, settings, fileSizeBytes, modelData, onSetting
         <div className="px-5 pb-4">
           <button
             onClick={handleOptimize}
-            className="w-full py-2.5 rounded-lg border border-primary/30 bg-primary/5 text-primary text-xs font-display tracking-wider uppercase hover:bg-primary/10 transition-all flex items-center justify-center gap-2"
+            className="w-full py-2.5 border border-primary bg-primary/5 text-primary text-xs font-sans tracking-[0.15em] uppercase font-semibold hover:bg-primary hover:text-primary-foreground transition-all flex items-center justify-center gap-2"
           >
             <Zap className="w-3.5 h-3.5" />
             Optimize For Lower Cost
@@ -83,7 +83,7 @@ const CostBreakdown = ({ estimate, settings, fileSizeBytes, modelData, onSetting
                 initial={{ opacity: 0, y: -5 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
-                className="text-xs text-primary text-center mt-2 font-mono"
+                className="text-xs text-walnut text-center mt-2 font-mono"
               >
                 ✓ Settings optimized for lower cost!
               </motion.p>
@@ -125,19 +125,19 @@ const CostBreakdown = ({ estimate, settings, fileSizeBytes, modelData, onSetting
 };
 
 const Stat = ({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) => (
-  <div className="bg-card/50 p-4">
+  <div className="bg-secondary/40 p-4">
     <div className="flex items-center gap-2 text-muted-foreground mb-1">
       {icon}
-      <span className="text-xs font-display uppercase tracking-wider">{label}</span>
+      <span className="text-xs uppercase tracking-[0.15em] font-sans">{label}</span>
     </div>
-    <p className="text-lg font-display font-bold text-foreground">{value}</p>
+    <p className="text-lg font-display font-bold text-foreground italic">{value}</p>
   </div>
 );
 
 const LineItem = ({ label, value, isDiscount }: { label: string; value: number; isDiscount?: boolean }) => (
   <div className="flex justify-between font-mono">
     <span className="text-muted-foreground">{label}</span>
-    <span className={isDiscount ? "text-primary" : "text-foreground"}>
+    <span className={isDiscount ? "text-walnut" : "text-foreground"}>
       {isDiscount ? "-" : ""}₪{Math.abs(value).toFixed(2)}
     </span>
   </div>
