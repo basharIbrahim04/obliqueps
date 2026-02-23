@@ -23,7 +23,7 @@ Deno.serve(async (req) => {
     const body = await req.json();
     const {
       customerName, customerEmail, customerPhone,
-      fileName, fileSize, material, color,
+      fileName, fileSize, fileUrl, material, color,
       infill, layerHeight, wallThickness, supports,
       estimatedWeight, estimatedTime, estimatedCost,
       priority, location, address, notes,
@@ -61,6 +61,8 @@ Deno.serve(async (req) => {
           <tr><td style="padding: 6px 0; color: #888;">Print Time</td><td style="padding: 6px 0;">${estimatedTime}</td></tr>
           <tr><td style="padding: 6px 0; color: #888; font-weight: bold;">Total Cost</td><td style="padding: 6px 0; font-size: 18px; color: #00e5ff; font-weight: bold;">₪${Number(estimatedCost).toFixed(2)}</td></tr>
         </table>
+
+        ${fileUrl ? `<h2 style="color: #00e5ff; margin-top: 20px;">📁 Download File</h2><p><a href="${fileUrl}" style="color: #00e5ff; text-decoration: underline; font-size: 16px;">Download ${fileName}</a></p>` : ""}
 
         ${notes ? `<h2 style="color: #00e5ff; margin-top: 20px;">Notes</h2><p>${notes}</p>` : ""}
       </div>

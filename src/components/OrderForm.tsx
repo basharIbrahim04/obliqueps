@@ -48,12 +48,31 @@ const OrderForm = ({ file, estimate, settings }: OrderFormProps) => {
     setErrors({});
     setSubmitting(true);
 
+    // Upload the STL file to storage
+    let fileUrl: string | null = null;
+    try {
+      const timestamp = Date.now();
+      const filePath = `${timestamp}_${file.name}`;
+      const { error: uploadError } = await supabase.storage
+        .from("order-files")
+        .upload(filePath, file);
+      if (!uploadError) {
+        const { data: urlData } = supabase.storage
+          .from("order-files")
+          .getPublicUrl(filePath);
+        fileUrl = urlData.publicUrl;
+      }
+    } catch {
+      // File upload is best-effort
+    }
+
     const { error } = await supabase.from("orders").insert({
       customer_name: form.name,
       customer_email: form.email,
       customer_phone: form.phone || null,
       file_name: file.name,
       file_size: file.size,
+      file_url: fileUrl,
       material: settings.material.id,
       color: settings.material.colorLabels[settings.colorIndex],
       infill: settings.infill,
@@ -69,7 +88,6 @@ const OrderForm = ({ file, estimate, settings }: OrderFormProps) => {
     });
 
     if (!error) {
-      // Send email notification
       try {
         await supabase.functions.invoke("send-order-email", {
           body: {
@@ -78,6 +96,7 @@ const OrderForm = ({ file, estimate, settings }: OrderFormProps) => {
             customerPhone: form.phone,
             fileName: file.name,
             fileSize: file.size,
+            fileUrl,
             material: settings.material.name,
             color: settings.material.colorLabels[settings.colorIndex],
             infill: settings.infill,
@@ -94,7 +113,7 @@ const OrderForm = ({ file, estimate, settings }: OrderFormProps) => {
           },
         });
       } catch {
-        // Email is best-effort, don't block the order
+        // Email is best-effort
       }
     }
 
