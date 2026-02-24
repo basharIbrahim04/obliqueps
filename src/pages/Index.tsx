@@ -6,9 +6,7 @@ import PrintConfigurator from "@/components/PrintConfigurator";
 import CostBreakdown from "@/components/CostBreakdown";
 import UseCaseSelector from "@/components/UseCaseSelector";
 import FileHealthCheck from "@/components/FileHealthCheck";
-import DeliveryEstimation from "@/components/DeliveryEstimation";
 import OrderForm from "@/components/OrderForm";
-import Logo3DService from "@/components/Logo3DService";
 import { DEFAULT_SETTINGS, estimateCost, analyzeFileHealth, USE_CASES, type PrintSettings, type Estimate, type ModelData } from "@/lib/estimator";
 import { type STLData } from "@/lib/stlParser";
 import { motion } from "framer-motion";
@@ -110,31 +108,16 @@ const Index = () => {
             </section>
           )}
 
-          {/* Step 5: Delivery */}
-          {estimate && (
-            <section>
-              <StepLabel step={5} label="Delivery & Timeline" />
-              <DeliveryEstimation
-                estimate={estimate}
-                settings={settings}
-                onPriorityChange={(p) => setSettings((s) => ({ ...s, priority: p }))}
-              />
-            </section>
-          )}
-
-          {/* Step 6: Order */}
+          {/* Step 5: Order */}
           {estimate && file && (
             <section>
-              <StepLabel step={6} label="Submit Order" />
+              <StepLabel step={5} label="Submit Order" />
+              <p className="text-sm text-muted-foreground mb-4 font-sans italic">
+                Orders are typically delivered within 1–2 days.
+              </p>
               <OrderForm file={file} estimate={estimate} settings={settings} />
             </section>
           )}
-
-          {/* Logo 3D Service */}
-          <section>
-            <StepLabel step="★" label="New Service" />
-            <Logo3DService />
-          </section>
         </main>
 
         <footer className="border-t border-border py-10 text-center bg-secondary/30">
