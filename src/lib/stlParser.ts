@@ -9,10 +9,106 @@ export interface STLData {
   triangleCount: number;
 }
 
+const ASCII_SOLID = "solid";
+const BINARY_FACE_BYTE_SIZE = 50;
+const BINARY_HEADER_SIZE = 84;
+
+function startsWithSolid(buffer: ArrayBuffer): boolean {
+  const bytes = new Uint8Array(buffer, 0, Math.min(256, buffer.byteLength));
+  const header = new TextDecoder().decode(bytes).trimStart().toLowerCase();
+  return header.startsWith(ASCII_SOLID);
+}
+
+function hasBinaryNullByte(buffer: ArrayBuffer): boolean {
+  const bytes = new Uint8Array(buffer, 0, Math.min(256, buffer.byteLength));
+  for (let i = 0; i < bytes.length; i++) {
+    if (bytes[i] === 0) return true;
+  }
+  return false;
+}
+
+function isLikelyBinarySTL(buffer: ArrayBuffer): boolean {
+  if (buffer.byteLength < BINARY_HEADER_SIZE) return false;
+
+  const view = new DataView(buffer);
+  const declaredFaces = view.getUint32(80, true);
+  const expectedSize = BINARY_HEADER_SIZE + declaredFaces * BINARY_FACE_BYTE_SIZE;
+
+  if (expectedSize === buffer.byteLength) return true;
+  if (startsWithSolid(buffer)) return false;
+  if (hasBinaryNullByte(buffer)) return true;
+
+  // Fallback: if it doesn't look like ASCII STL, treat as binary.
+  return true;
+}
+
+function parseBinarySTLSafely(buffer: ArrayBuffer): THREE.BufferGeometry {
+  if (buffer.byteLength < BINARY_HEADER_SIZE) {
+    throw new Error("STL file is too small to be valid.");
+  }
+
+  const view = new DataView(buffer);
+  const declaredFaces = view.getUint32(80, true);
+  const maxFacesFromSize = Math.floor((buffer.byteLength - BINARY_HEADER_SIZE) / BINARY_FACE_BYTE_SIZE);
+
+  // Some exporters write corrupt face counts for large files.
+  // Clamp to what the byte length can actually contain.
+  const faceCount =
+    declaredFaces > 0 && declaredFaces <= maxFacesFromSize ? declaredFaces : maxFacesFromSize;
+
+  if (faceCount <= 0) {
+    throw new Error("No triangles found in STL file.");
+  }
+
+  const positions = new Float32Array(faceCount * 9);
+  const normals = new Float32Array(faceCount * 9);
+
+  let offset = BINARY_HEADER_SIZE;
+  let pOffset = 0;
+
+  for (let face = 0; face < faceCount; face++) {
+    if (offset + BINARY_FACE_BYTE_SIZE > buffer.byteLength) break;
+
+    const nx = view.getFloat32(offset, true);
+    const ny = view.getFloat32(offset + 4, true);
+    const nz = view.getFloat32(offset + 8, true);
+    offset += 12;
+
+    for (let v = 0; v < 3; v++) {
+      positions[pOffset] = view.getFloat32(offset, true);
+      positions[pOffset + 1] = view.getFloat32(offset + 4, true);
+      positions[pOffset + 2] = view.getFloat32(offset + 8, true);
+
+      normals[pOffset] = nx;
+      normals[pOffset + 1] = ny;
+      normals[pOffset + 2] = nz;
+
+      pOffset += 3;
+      offset += 12;
+    }
+
+    offset += 2; // attribute byte count
+  }
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  geometry.setAttribute("normal", new THREE.BufferAttribute(normals, 3));
+
+  return geometry;
+}
+
 export async function parseSTLFile(file: File): Promise<STLData> {
   const buffer = await file.arrayBuffer();
   const loader = new STLLoader();
-  const geometry = loader.parse(buffer);
+
+  let geometry: THREE.BufferGeometry;
+
+  try {
+    geometry = isLikelyBinarySTL(buffer) ? parseBinarySTLSafely(buffer) : loader.parse(buffer);
+  } catch {
+    // Fallback path for edge-case files where heuristic guessed wrong.
+    geometry = loader.parse(buffer);
+  }
 
   geometry.computeBoundingBox();
   const box = geometry.boundingBox!;
