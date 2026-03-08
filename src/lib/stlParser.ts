@@ -97,17 +97,32 @@ function parseBinarySTLSafely(buffer: ArrayBuffer): THREE.BufferGeometry {
   return geometry;
 }
 
+function geometryIsValid(geom: THREE.BufferGeometry): boolean {
+  geom.computeBoundingBox();
+  const box = geom.boundingBox;
+  if (!box) return false;
+  return isFinite(box.min.x) && isFinite(box.max.x);
+}
+
 export async function parseSTLFile(file: File): Promise<STLData> {
   const buffer = await file.arrayBuffer();
   const loader = new STLLoader();
 
   let geometry: THREE.BufferGeometry;
 
+  // Strategy: try STLLoader first (handles both ASCII & binary).
+  // If it crashes (RangeError on huge files with corrupt header), use our safe binary parser.
   try {
-    geometry = isLikelyBinarySTL(buffer) ? parseBinarySTLSafely(buffer) : loader.parse(buffer);
-  } catch {
-    // Fallback path for edge-case files where heuristic guessed wrong.
     geometry = loader.parse(buffer);
+    if (!geometryIsValid(geometry)) {
+      throw new Error("STLLoader produced invalid geometry");
+    }
+  } catch {
+    // STLLoader failed (likely corrupt face count for large binary files) — use safe parser
+    geometry = parseBinarySTLSafely(buffer);
+    if (!geometryIsValid(geometry)) {
+      throw new Error("Unable to parse STL file — the file may be corrupt.");
+    }
   }
 
   geometry.computeBoundingBox();
